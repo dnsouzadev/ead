@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ead</groupId>
-	<artifactId>authuser</artifactId>
+	<artifactId>course</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>authuser</name>
-	<description>Demo project for Spring Boot</description>
+	<name>course</name>
+	<description>course</description>
 	<url/>
 	<licenses>
 		<license/>
