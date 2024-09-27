@@ -12,4 +12,10 @@ public interface UserService {
     Optional<UserModel> findById(UUID id);
 
     void delete(UUID id);
+
+    void save(UserModel userModel);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }
