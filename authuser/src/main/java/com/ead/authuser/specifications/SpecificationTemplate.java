@@ -1,5 +1,7 @@
 package com.ead.authuser.specifications;
 
+import com.ead.authuser.enums.UserStatus;
+import com.ead.authuser.enums.UserType;
 import com.ead.authuser.models.UserModel;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
@@ -9,12 +11,12 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class SpecificationTemplate {
 
-    public static Specification<UserModel> userTypeEquals(String userType) {
+    public static Specification<UserModel> userTypeEquals(UserType userType) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("userType"), userType);
     }
 
-    public static Specification<UserModel> userStatusEquals(String userStatus) {
+    public static Specification<UserModel> userStatusEquals(UserStatus userStatus) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("userStatus"), userStatus);
     }
