@@ -30,10 +30,10 @@ public class ModuleModel implements Serializable {
     private LocalDateTime creationDate;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private CourseModel course;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "module")
+    @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
     private Set<LessonModel> lessons;
 }
