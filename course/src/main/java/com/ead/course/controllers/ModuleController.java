@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ModuleController {
     private CourseService courseService;
 
     @PostMapping("/courses/{courseId}/modules")
-    public ResponseEntity<Object> saveModule(@PathVariable UUID courseId, @RequestBody ModuleDto moduleDto) {
+    public ResponseEntity<Object> saveModule(@PathVariable UUID courseId, @RequestBody @Valid ModuleDto moduleDto) {
 
         Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
         if(!courseModelOptional.isPresent()) {
@@ -55,7 +56,7 @@ public class ModuleController {
     }
 
     @PutMapping("/courses/{courseId}/modules/{moduleId}")
-    public ResponseEntity<Object> updateModule(@PathVariable(value = "courseId") UUID courseId, @PathVariable(value = "moduleId") UUID moduleId, @RequestBody ModuleDto moduleDto) {
+    public ResponseEntity<Object> updateModule(@PathVariable(value = "courseId") UUID courseId, @PathVariable(value = "moduleId") UUID moduleId, @RequestBody @Valid ModuleDto moduleDto) {
         Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
 
         if(!moduleModelOptional.isPresent()) {
