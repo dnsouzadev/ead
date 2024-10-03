@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -46,6 +47,15 @@ public class SpecificationTemplate {
 
             Join<ModuleModel, CourseModel> courseJoin = root.join("course");
             return criteriaBuilder.equal(courseJoin.get("id"), courseId);
+        };
+    }
+
+    public static Specification<LessonModel> lessonModuleId(UUID moduleId) {
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+
+            Join<LessonModel, ModuleModel> moduleJoin = root.join("module");
+            return criteriaBuilder.equal(moduleJoin.get("id"), moduleId);
         };
     }
 }
