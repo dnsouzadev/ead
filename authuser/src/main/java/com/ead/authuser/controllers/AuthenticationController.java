@@ -31,7 +31,7 @@ public class AuthenticationController {
                                                     @Validated(UserDto.UserView.RegistrationPost.class)
                                                    @JsonView(UserDto.UserView.RegistrationPost.class) UserDto userDto) {
 
-        log.debug("POST registerUser userDto received {}", userDto.toString());
+        log.debug("POST registerUser userDto userId {}", userDto.getUserId());
 
         if(userService.existsByUsername(userDto.getUsername())) {
             log.warn("POST registerUser username already exists {}", userDto.getUsername());
@@ -51,7 +51,7 @@ public class AuthenticationController {
         userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
         userService.save(userModel);
 
-        log.debug("POST registerUser userModel saved {}", userModel.toString());
+        log.debug("POST registerUser userModel userId {}", userModel.getId());
         log.info("User saved successfully userId {}", userModel.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userModel);
