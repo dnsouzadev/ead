@@ -12,9 +12,9 @@ import java.util.UUID;
 
 public interface ModuleRepository extends JpaRepository<ModuleModel, UUID>, JpaSpecificationExecutor<ModuleModel> {
 
-    @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId", nativeQuery = true)
+    @Query(value = "SELECT * FROM tb_modules WHERE course_id = :courseId", nativeQuery = true)
     List<ModuleModel> findAllModulesIntoCourse(@Param("courseId") UUID courseId);
 
-    @Query(value = "SELECT * FROM tb_modules WHERE course_course_id = :courseId AND module_id = :moduleId", nativeQuery = true)
+    @Query(value = "SELECT * FROM tb_modules WHERE course_id = :courseId AND id = :moduleId", nativeQuery = true)
     Optional<ModuleModel> findModuleIntoCourse(@Param("courseId") UUID courseId, @Param("moduleId") UUID moduleId);
 }

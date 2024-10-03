@@ -78,7 +78,7 @@ public class ModuleController {
     @GetMapping("/courses/{courseId}/modules")
     public ResponseEntity<Page<ModuleModel>> getAllModules(@PathVariable("courseId") UUID courseId,
                                                            @RequestParam(required = false) String title,
-                                                           @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable page) {
+                                                           @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page) {
         Specification<ModuleModel> spec = Specification.where(null);
 
         if (title != null) {

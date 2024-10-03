@@ -28,7 +28,7 @@ public class ModuleServiceImpl implements ModuleService {
     @Transactional
     @Override
     public void delete(ModuleModel moduleModel) {
-        List<LessonModel> lessonModelList = lessonRepository.findAllLessonsIntoModule(moduleModel.getModuleId());
+        List<LessonModel> lessonModelList = lessonRepository.findAllLessonsIntoModule(moduleModel.getId());
         if (!lessonModelList.isEmpty()) {
             lessonRepository.deleteAll(lessonModelList);
         }

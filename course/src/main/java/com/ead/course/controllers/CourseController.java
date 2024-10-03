@@ -75,7 +75,7 @@ public class CourseController {
     public ResponseEntity<Page<CourseModel>> getAllCourses(@RequestParam(required = false) CourseLevel courseLevel,
                                                 @RequestParam(required = false) CourseStatus courseStatus,
                                                 @RequestParam(required = false) String name,
-                                                @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable page) {
+                                                @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page) {
 
         Specification<CourseModel> spec = Specification.where(null);
 
