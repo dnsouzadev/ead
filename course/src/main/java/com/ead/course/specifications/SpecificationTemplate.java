@@ -3,6 +3,7 @@ package com.ead.course.specifications;
 import com.ead.course.enums.CourseLevel;
 import com.ead.course.enums.CourseStatus;
 import com.ead.course.models.CourseModel;
+import com.ead.course.models.CourseUserModel;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
 import org.springframework.data.jpa.domain.Specification;
@@ -56,6 +57,15 @@ public class SpecificationTemplate {
 
             Join<LessonModel, ModuleModel> moduleJoin = root.join("module");
             return criteriaBuilder.equal(moduleJoin.get("id"), moduleId);
+        };
+    }
+
+    public static Specification<CourseModel> courseUserId(final UUID userId) {
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+
+            Join<CourseModel, CourseUserModel> userProd = root.join("coursesUsers");
+            return criteriaBuilder.equal(userProd.get("userId"), userId);
         };
     }
 }
