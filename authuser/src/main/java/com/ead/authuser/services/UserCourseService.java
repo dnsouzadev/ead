@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 public interface UserCourseService {
-    boolean existsByCourseAndUserId(UserModel userModel, UUID userId);
+    boolean existsByUserAndCourseId(UserModel userModel, UUID courseId);
 
     UserCourseModel save(UserCourseModel userCourseModel);
 }

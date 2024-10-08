@@ -36,7 +36,7 @@ public class UserCourseController {
     private UserCourseService userCourseService;
 
     @GetMapping("/users/{userId}/courses")
-    public ResponseEntity<Page<CourseDto>> getAllCoursesByUser(@PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable page,
+    public ResponseEntity<Page<CourseDto>> getAllCoursesByUser(@PageableDefault(sort = "courseId", direction = Sort.Direction.ASC) Pageable page,
                                                                @PathVariable("userId") UUID userId) {
         log.debug("GET getAllCoursesByUser");
         return ResponseEntity.status(HttpStatus.OK).body(courseClient.getAllCoursesByUser(userId, page));
@@ -49,11 +49,11 @@ public class UserCourseController {
         Optional<UserModel> userModelOptional = userService.findById(userId);
         if (!userModelOptional.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
 
-        if(userCourseService.existsByCourseAndUserId(userModelOptional.get(), userId)) return ResponseEntity.status(HttpStatus.CONFLICT).body("User already subscribed to this course");
+        if(userCourseService.existsByUserAndCourseId(userModelOptional.get(), userCourseDto.getCourseId())) return ResponseEntity.status(HttpStatus.CONFLICT).body("User already subscribed to this course");
 
         UserCourseModel userCourseModel = userCourseService.save(userModelOptional.get().convertToUserCourseModel(userCourseDto.getCourseId()));
 
-        return ResponseEntity.status(HttpStatus.OK).body(userCourseModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userCourseModel);
     }
 
 }
