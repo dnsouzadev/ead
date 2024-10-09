@@ -5,14 +5,17 @@ spring:
   application:
     name: ead-api-gateway
 
+  main:
+    web-application-type: reactive
+
   cloud:
     gateway:
-      routes:
-        - id: authuser-service
-          uri: http://localhost:8087
-          predicates:
-            - Path=/ead-authuser/**
-        - id: course-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/ead-course/**
+        routes:
+          - id: authuser-service
+            uri: http://localhost:8087/
+            predicates:
+              - Path=/ead-authuser/**
+          - id: course-service
+            uri: http://localhost:8082/
+            predicates:
+              - Path=/ead-course/**
