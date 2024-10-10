@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 public class CourseUserDto {
 
+    @NotNull
     private UUID courseId;
     private UUID userId;
 

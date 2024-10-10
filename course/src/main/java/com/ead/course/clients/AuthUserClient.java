@@ -6,14 +6,14 @@ import com.ead.course.dtos.UserDto;
 import com.ead.course.services.UtilsService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.coyote.Response;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -63,12 +63,11 @@ public class AuthUserClient {
 
     public void postSubscriptionUserInCourse(UUID courseId, UUID userId) {
         String url = REQUEST_URL_AUTHUSER + "/users/" + userId + "/courses/subscription";
-        log.debug("Request URL: {}", url);
-
-        var courseUserDto = new CourseUserDto();
-        courseUserDto.setCourseId(courseId);
-        courseUserDto.setUserId(userId);
-        restTemplate.postForObject(url, courseUserDto, String.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String requestBody = String.format("{\"courseId\": \"%s\"}", courseId);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
     }
 

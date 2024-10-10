@@ -47,7 +47,7 @@ public class CourseUserController {
     @PostMapping("/courses/{courseId}/users/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable("courseId") UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
         log.debug("POST saveSubscriptionUserInCourse");
-
+        log.debug("subs" + subscriptionDto);
         ResponseEntity<UserDto> responseUser;
         Optional<CourseModel> courseExists = courseService.findById(courseId);
         if (!courseExists.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
@@ -61,6 +61,7 @@ public class CourseUserController {
             if(e.getStatusCode() == HttpStatus.NOT_FOUND) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
+        log.debug("chega aqui");
         CourseUserModel courseUserModel = courseUserService.saveAndSendSubscriptionUserInCourse(courseExists.get().convertToCourseUserModel(subscriptionDto.getUserId()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(courseUserModel);

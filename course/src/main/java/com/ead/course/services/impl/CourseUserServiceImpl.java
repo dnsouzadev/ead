@@ -35,7 +35,15 @@ public class CourseUserServiceImpl implements CourseUserService {
     public CourseUserModel saveAndSendSubscriptionUserInCourse(CourseUserModel courseUserModel) {
         courseUserModel = courseUserRepository.save(courseUserModel);
 
-        authUserClient.postSubscriptionUserInCourse(courseUserModel.getCourse().getId(), courseUserModel.getUserId());
+        System.out.println("Enviando requisição para o serviço de autenticação");
+        System.out.println(courseUserModel);
+
+        try {
+            authUserClient.postSubscriptionUserInCourse(courseUserModel.getCourse().getId(), courseUserModel.getUserId());
+        } catch (Exception e) {
+            System.out.println("Erro ao enviar requisição para o serviço de autenticação");
+            System.out.println(e.getMessage());
+        }
 
         return courseUserModel;
 
