@@ -38,16 +38,20 @@ public class CourseUserController {
     private CourseUserService courseUserService;
 
     @GetMapping("/courses/{courseId}/users")
-    public ResponseEntity<Page<UserDto>> getAllUsersByCourse(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page,
+    public ResponseEntity<Object> getAllUsersByCourse(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page,
                                                              @PathVariable("courseId") UUID userId) {
         log.debug("GET getAllUsersByCourse");
+
+        Optional<CourseModel> courseModelOptional = courseService.findById(userId);
+        if (!courseModelOptional.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
+
         return ResponseEntity.status(HttpStatus.OK).body(authUserClient.getAllCoursesByUser(userId, page));
     }
 
     @PostMapping("/courses/{courseId}/users/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable("courseId") UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
         log.debug("POST saveSubscriptionUserInCourse");
-        log.debug("subs" + subscriptionDto);
+
         ResponseEntity<UserDto> responseUser;
         Optional<CourseModel> courseExists = courseService.findById(courseId);
         if (!courseExists.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
@@ -65,5 +69,14 @@ public class CourseUserController {
         CourseUserModel courseUserModel = courseUserService.saveAndSendSubscriptionUserInCourse(courseExists.get().convertToCourseUserModel(subscriptionDto.getUserId()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(courseUserModel);
+    }
+
+    @DeleteMapping("/courses/users/{userId}")
+    public ResponseEntity<Object> deleteCourseUserByUser(@PathVariable("userId") UUID userId) {
+        log.debug("DELETE deleteUserInCourse");
+
+        if(!courseUserService.existsByUserId(userId)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        courseUserService.deleteCourseUserByUser(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("CourseUser deleted successfully");
     }
 }

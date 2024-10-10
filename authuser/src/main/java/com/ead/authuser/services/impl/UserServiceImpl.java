@@ -1,5 +1,6 @@
 package com.ead.authuser.services.impl;
 
+import com.ead.authuser.clients.CourseClient;
 import com.ead.authuser.models.UserCourseModel;
 import com.ead.authuser.models.UserModel;
 import com.ead.authuser.repositories.UserCourseRepository;
@@ -25,6 +26,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserCourseRepository userCourseRepository;
 
+    @Autowired
+    private CourseClient courseClient;
+
     @Override
     public List<UserModel> findAll() {
         return userRepository.findAll();
@@ -37,11 +41,16 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void delete(UUID id) {
-        List<UserCourseModel> userCourseModelList = userCourseRepository.findAllUserCourseIntoUser(id);
-        if(!userCourseModelList.isEmpty()) userCourseRepository.deleteAll(userCourseModelList);
+    public void delete(UserModel userModel) {
+        boolean deleteUserCourseInCourse = false;
+        List<UserCourseModel> userCourseModelList = userCourseRepository.findAllUserCourseIntoUser(userModel.getId());
+        if (!userCourseModelList.isEmpty()) {
+            userCourseRepository.deleteAll(userCourseModelList);
+            deleteUserCourseInCourse = true;
+        }
+        userRepository.delete(userModel);
+        if (deleteUserCourseInCourse) courseClient.deleteUserInCourse(userModel.getId());
 
-        userRepository.deleteById(id);
     }
 
     @Override
@@ -61,9 +70,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserModel> findAll(Specification<UserModel> spec, Pageable page) {
-        System.out.println("spec: " + spec);
-        System.out.println("page: " + page);
-        System.out.println(userRepository.findAll(spec, page));
         return userRepository.findAll(spec, page);
     }
 }

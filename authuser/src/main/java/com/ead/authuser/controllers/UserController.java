@@ -90,7 +90,7 @@ public class UserController {
         log.debug("DELETE deleteUser id received {}", id);
         Optional<UserModel> userModelOptional = userService.findById(id);
         if (userModelOptional.isPresent()) {
-            userService.delete(id);
+            userService.delete(userModelOptional.get());
             log.info("User deleted successfully userId {}", id);
             return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
         } else {
