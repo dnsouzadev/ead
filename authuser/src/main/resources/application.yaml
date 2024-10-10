@@ -4,7 +4,6 @@ server:
     context-path: '/ead-authuser/'
 
 
-
 spring:
   application:
     name: ead-authuser
@@ -12,6 +11,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/ead-authuser
     username: postgres
     password: root
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,7 +26,8 @@ spring:
     properties:
       hibernate:
         show_sql: true
-
+        format_sql: true
+        use_sql_comments: true
 
 logging:
   level:
@@ -30,11 +35,13 @@ logging:
     root: INFO
     org.springframework.web: DEBUG
     org.hibernate: INFO
+    org.hibernate.sql: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 ead:
   api:
     url:
-      authuser: 'http://ead-course'
+      authuser: 'lb://ead-course/ead-course'
 
 eureka:
   client:

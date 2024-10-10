@@ -1,5 +1,6 @@
 package com.ead.authuser.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class UserCourseModel  implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JsonBackReference
     private UserModel user;
     @Column(nullable = false)
     private UUID courseId;

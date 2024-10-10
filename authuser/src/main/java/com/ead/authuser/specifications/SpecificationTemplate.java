@@ -33,11 +33,12 @@ public class SpecificationTemplate {
 
     public static Specification<UserModel> userCourseId(final UUID courseId) {
         return (root, query, criteriaBuilder) -> {
-
             query.distinct(true);
-            Join<UserModel, UserCourseModel> userProd = root.join("userCourses");
-            return criteriaBuilder.equal(userProd.get("courseId"), courseId);
-
+            // Apenas junte se for necessário para a consulta
+            // Caso contrário, evite o Join
+            return criteriaBuilder.equal(root.join("userCourses").get("courseId"), courseId);
         };
     }
+
 }
+

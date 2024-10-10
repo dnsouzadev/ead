@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,13 +48,32 @@ public class UserCourseController {
         log.debug("POST saveSubscriptionUserInCourse");
 
         Optional<UserModel> userModelOptional = userService.findById(userId);
-        if (!userModelOptional.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        if (!userModelOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
 
-        if(userCourseService.existsByUserAndCourseId(userModelOptional.get(), userCourseDto.getCourseId())) return ResponseEntity.status(HttpStatus.CONFLICT).body("User already subscribed to this course");
+        // Verifica se o usuário já está inscrito antes de tentar salvar
+        if (userCourseService.existsByUserAndCourseId(userId, userCourseDto.getCourseId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already subscribed to this course");
+        }
 
-        UserCourseModel userCourseModel = userCourseService.save(userModelOptional.get().convertToUserCourseModel(userCourseDto.getCourseId()));
+        UserCourseModel userCourseModel = new UserCourseModel(null, userModelOptional.get(), userCourseDto.getCourseId());
+        userCourseService.save(userCourseModel);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userCourseModel);
+    }
+
+    @DeleteMapping("/users/courses/{courseId}")
+    public ResponseEntity<Object> deleteUserCourseByCourse(@PathVariable("courseId") UUID courseId) {
+        log.debug("DELETE deleteUserCourseByCourse");
+
+        if(!userCourseService.existsByCourseId(courseId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("UserCourse not found");
+        }
+
+        userCourseService.deleteUserCourseByCourse(courseId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("User course deleted");
     }
 
 }

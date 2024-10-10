@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "TB_COURSES_USERS")
+@Table(name = "TB_COURSE_USER")
 public class CourseUserModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
