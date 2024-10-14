@@ -42,8 +42,7 @@ public class UserController {
             @RequestParam(required = false) UserStatus userStatus,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String fullName,
-            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page,
-            @RequestParam(required = false) UUID courseId) {
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page) {
 
         log.debug("GET getAllUsers");
         Specification<UserModel> spec = Specification.where(null);
@@ -61,13 +60,7 @@ public class UserController {
             spec = spec.and(SpecificationTemplate.fullNameLike(fullName));
         }
 
-        Page<UserModel> userModelPage = null;
-
-        if (courseId != null) {
-            userModelPage = userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), page);
-        } else {
-            userModelPage = userService.findAll(spec, page);
-        }
+        Page<UserModel> userModelPage = userService.findAll(spec, page);
 
         if (!userModelPage.isEmpty()) {
             for(UserModel user : userModelPage.toList()) {

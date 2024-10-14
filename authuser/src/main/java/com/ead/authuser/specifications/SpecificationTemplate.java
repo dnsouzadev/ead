@@ -2,11 +2,9 @@ package com.ead.authuser.specifications;
 
 import com.ead.authuser.enums.UserStatus;
 import com.ead.authuser.enums.UserType;
-import com.ead.authuser.models.UserCourseModel;
 import com.ead.authuser.models.UserModel;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.Join;
 import java.util.UUID;
 
 public class SpecificationTemplate {
@@ -29,15 +27,6 @@ public class SpecificationTemplate {
     public static Specification<UserModel> fullNameLike(String fullName) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.like(root.get("fullName"), "%" + fullName + "%");
-    }
-
-    public static Specification<UserModel> userCourseId(final UUID courseId) {
-        return (root, query, criteriaBuilder) -> {
-            query.distinct(true);
-            // Apenas junte se for necessário para a consulta
-            // Caso contrário, evite o Join
-            return criteriaBuilder.equal(root.join("userCourses").get("courseId"), courseId);
-        };
     }
 
 }

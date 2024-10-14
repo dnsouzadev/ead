@@ -84,7 +84,6 @@ public class CourseController {
     public ResponseEntity<Page<CourseModel>> getAllCourses(@RequestParam(required = false) CourseLevel courseLevel,
                                                 @RequestParam(required = false) CourseStatus courseStatus,
                                                 @RequestParam(required = false) String name,
-                                                @RequestParam(required = false) UUID userId,
                                                 @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page) {
 
         Specification<CourseModel> spec = Specification.where(null);
@@ -99,13 +98,7 @@ public class CourseController {
             spec = spec.and(SpecificationTemplate.nameLike(name));
         }
 
-        Page<CourseModel> courseModelPage = null;
-
-        if (userId != null) {
-            courseModelPage = courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), page);
-        } else {
-            courseModelPage = courseService.findAll(spec, page);
-        }
+        Page<CourseModel> courseModelPage = courseService.findAll(spec, page);
 
         return ResponseEntity.status(HttpStatus.OK).body(courseModelPage);
     }
