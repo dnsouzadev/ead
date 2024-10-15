@@ -84,22 +84,19 @@ public class CourseController {
     public ResponseEntity<Page<CourseModel>> getAllCourses(@RequestParam(required = false) CourseLevel courseLevel,
                                                 @RequestParam(required = false) CourseStatus courseStatus,
                                                 @RequestParam(required = false) String name,
+                                                @RequestParam(required = false) UUID userId,
                                                 @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page) {
 
         Specification<CourseModel> spec = Specification.where(null);
 
-        if (courseLevel != null) {
-            spec = spec.and(SpecificationTemplate.courseLevelEquals(courseLevel));
-        }
-        if (courseStatus != null) {
-            spec = spec.and(SpecificationTemplate.courseStatusEquals(courseStatus));
-        }
-        if (name != null) {
-            spec = spec.and(SpecificationTemplate.nameLike(name));
-        }
+        if (courseLevel != null) spec = spec.and(SpecificationTemplate.courseLevelEquals(courseLevel));
+        if (courseStatus != null) spec = spec.and(SpecificationTemplate.courseStatusEquals(courseStatus));
+        if (name != null) spec = spec.and(SpecificationTemplate.nameLike(name));
 
-        Page<CourseModel> courseModelPage = courseService.findAll(spec, page);
+        System.out.println("userId: " + userId);
+        System.out.println("spec: " + spec);
+        if (userId != null) return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), page));
+        else return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(spec, page));
 
-        return ResponseEntity.status(HttpStatus.OK).body(courseModelPage);
     }
 }
