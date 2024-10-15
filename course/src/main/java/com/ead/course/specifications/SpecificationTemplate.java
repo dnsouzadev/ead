@@ -94,7 +94,8 @@ public class SpecificationTemplate {
             query.distinct(true);
             Root<CourseModel> course = root;
             Root<UserModel> user = query.from(UserModel.class);
-            Expression<Collection<CourseModel>> usersCourses = course.get("courses");
+            Expression<Collection<CourseModel>> usersCourses = user.get("courses");
+            System.out.println("usersCourses: " + usersCourses);
             return criteriaBuilder.and(criteriaBuilder.equal(course.get("id"), userId), criteriaBuilder.isMember(course, usersCourses));
         };
     }
