@@ -20,6 +20,8 @@ spring:
     properties:
       hibernate:
         show_sql: true
+  rabbitmq:
+    addresses: amqps://gorggwmo:YNKlXEKclSDw_0Ovjhh9o5nEGBShhvxW@gull.rmq.cloudamqp.com/gorggwmo
 
 logging:
   level:

@@ -28,6 +28,8 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+  rabbitmq:
+    addresses: amqps://gorggwmo:YNKlXEKclSDw_0Ovjhh9o5nEGBShhvxW@gull.rmq.cloudamqp.com/gorggwmo
 
 logging:
   level:
@@ -42,6 +44,9 @@ ead:
   api:
     url:
       authuser: 'lb://ead-course/ead-course'
+  broker:
+    exchange:
+      userEvent: ead.userevent
 
 eureka:
   client:
