@@ -56,14 +56,4 @@ public class AuthenticationController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
-
-    @GetMapping("/")
-    public String index() {
-        log.info("Index");
-
-        return "Greetings from Spring Boot!";
-    }
-
-
-
 }
