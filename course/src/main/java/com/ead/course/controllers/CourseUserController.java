@@ -62,6 +62,15 @@ public class CourseUserController {
         Optional<CourseModel> courseExists = courseService.findById(courseId);
         if (!courseExists.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("");
+        if(courseService.existsByCourseAndUser(courseId, subscriptionDto.getUserId())) return ResponseEntity.status(HttpStatus.CONFLICT).body("User already subscribed to this course");
+
+        Optional<UserModel> userModelOptional = userService.findById(subscriptionDto.getUserId());
+        if (!userModelOptional.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+
+        if (userModelOptional.get().getUserStatus().equals(UserStatus.BLOCKED.toString())) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is blocked");
+
+        courseService.saveSubscriptionUserInCourse(courseExists.get().getId(), userModelOptional.get().getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Subscription created successfully");
     }
 }

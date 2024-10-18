@@ -9,6 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -23,5 +26,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel save(UserModel userModel) {
         return userRepository.save(userModel);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<UserModel> findById(UUID userInstructor) {
+        return userRepository.findById(userInstructor);
     }
 }
