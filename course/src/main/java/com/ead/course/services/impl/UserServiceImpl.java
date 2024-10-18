@@ -1,6 +1,7 @@
 package com.ead.course.services.impl;
 import com.ead.course.models.CourseModel;
 import com.ead.course.models.UserModel;
+import com.ead.course.repositories.CourseRepository;
 import com.ead.course.repositories.UserRepository;
 import com.ead.course.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -17,6 +19,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    CourseRepository courseRepository;
 
     @Override
     public Page<UserModel> findAll(Specification<UserModel> spec, Pageable page) {
@@ -29,7 +34,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
+        courseRepository.deleteCourseUserByUser(id);
         userRepository.deleteById(id);
     }
 
