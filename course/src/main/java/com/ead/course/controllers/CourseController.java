@@ -92,11 +92,10 @@ public class CourseController {
         if (courseLevel != null) spec = spec.and(SpecificationTemplate.courseLevelEquals(courseLevel));
         if (courseStatus != null) spec = spec.and(SpecificationTemplate.courseStatusEquals(courseStatus));
         if (name != null) spec = spec.and(SpecificationTemplate.nameLike(name));
-
-        System.out.println("userId: " + userId);
-        System.out.println("spec: " + spec);
-        if (userId != null) return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), page));
-        else return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(spec, page));
+        if (userId != null)
+            return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), page));
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(spec, page));
 
     }
 }
