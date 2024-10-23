@@ -1,72 +1,9 @@
-server:
-  port: 8087
-  servlet:
-    context-path: '/ead-authuser/'
-
-
 spring:
   application:
     name: ead-authuser
-  datasource:
-    url: jdbc:postgresql://localhost:5432/ead-authuser
-    username: postgres
-    password: root
-    hikari:
-      maximum-pool-size: 10
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-  jpa:
-    hibernate:
-      ddl-auto: update
-      dialect: org.hibernate.dialect.PostgreSQLDialect
-      jdbc:
-        lob:
-          non_contextual_creation: true
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        use_sql_comments: true
-  rabbitmq:
-    addresses: amqps://gorggwmo:YNKlXEKclSDw_0Ovjhh9o5nEGBShhvxW@gull.rmq.cloudamqp.com/gorggwmo
-
-logging:
-  level:
-    com.ead: TRACE
-    root: INFO
-    org.springframework.web: DEBUG
-    org.hibernate: INFO
-    org.hibernate.sql: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
-ead:
-  api:
-    url:
-      authuser: 'lb://ead-course/ead-course'
-  broker:
-    exchange:
-      userEvent: ead.userevent
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    hostname: localhost
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      circuitbreakerInstance:
-        sliding-window-size: 30
-        permitted-number-of-calls-in-half-open-state: 2
-        sliding-window-type: TIME_BASED
-        minimum-number-of-calls: 2
-        wait-duration-in-open-state: 30s
-        failure-rate-threshold: 80
-  retry:
-    instances:
-      retryInstance:
-        maxAttempts: 3
-        waitDuration: 5s
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      discovery:
+        serviceId: ead-config-server
