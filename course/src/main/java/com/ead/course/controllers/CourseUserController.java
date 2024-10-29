@@ -50,7 +50,7 @@ public class CourseUserController {
         if(userStatus != null) spec = spec.and(SpecificationTemplate.UserStatusUserEquals(userStatus));
 
         Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
-        if (!courseModelOptional.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
+        if (courseModelOptional.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
 
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), page));
     }
@@ -60,16 +60,17 @@ public class CourseUserController {
         log.debug("POST saveSubscriptionUserInCourse");
 
         Optional<CourseModel> courseExists = courseService.findById(courseId);
-        if (!courseExists.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
+        if (courseExists.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
 
         if(courseService.existsByCourseAndUser(courseId, subscriptionDto.getUserId())) return ResponseEntity.status(HttpStatus.CONFLICT).body("User already subscribed to this course");
 
         Optional<UserModel> userModelOptional = userService.findById(subscriptionDto.getUserId());
-        if (!userModelOptional.isPresent()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        if (userModelOptional.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
 
         if (userModelOptional.get().getUserStatus().equals(UserStatus.BLOCKED.toString())) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is blocked");
 
-        courseService.saveSubscriptionUserInCourse(courseExists.get().getId(), userModelOptional.get().getId());
+//        courseService.saveSubscriptionUserInCourse(courseExists.get().getId(), userModelOptional.get().getId());
+        courseService.saveSubscriptionUserInCourseAndSendNotification(courseExists.get(), userModelOptional.get());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Subscription created successfully");
     }
