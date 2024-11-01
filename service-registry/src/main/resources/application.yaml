@@ -5,6 +5,11 @@ spring:
   application:
     name: ead-service-registry
 
+ead:
+  serviceRegistry:
+    username: serviceregistry
+    passwrod: 'ead123sr'
+
 eureka:
   client:
     register-with-eureka: false
