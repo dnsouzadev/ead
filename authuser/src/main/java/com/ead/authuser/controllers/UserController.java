@@ -1,5 +1,7 @@
 package com.ead.authuser.controllers;
 
+import com.ead.authuser.configs.security.AuthenticationCurrentUserService;
+import com.ead.authuser.configs.security.UserDetailsImpl;
 import com.ead.authuser.dtos.UserDto;
 import com.ead.authuser.enums.UserStatus;
 import com.ead.authuser.enums.UserType;
@@ -16,11 +18,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,46 +43,50 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    AuthenticationCurrentUserService authenticationCurrentUserService;
+
+    @PreAuthorize("hasAnyRole('USER')")
     @GetMapping
     public ResponseEntity<?> getAllUsers(
             @RequestParam(required = false) UserType userType,
             @RequestParam(required = false) UserStatus userStatus,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String fullName,
-            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page) {
-
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable page,
+            Authentication authentication) {
+        UserDetails userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        log.info("Authentication User {}", userDetails.getUsername());
         log.debug("GET getAllUsers");
         Specification<UserModel> spec = Specification.where(null);
 
-        if (userType != null) {
-            spec = spec.and(SpecificationTemplate.userTypeEquals(userType));
-        }
-        if (userStatus != null) {
-            spec = spec.and(SpecificationTemplate.userStatusEquals(userStatus));
-        }
-        if (email != null) {
-            spec = spec.and(SpecificationTemplate.emailLike(email));
-        }
-        if (fullName != null) {
-            spec = spec.and(SpecificationTemplate.fullNameLike(fullName));
-        }
+        if (userType != null) spec = spec.and(SpecificationTemplate.userTypeEquals(userType));
+        if (userStatus != null) spec = spec.and(SpecificationTemplate.userStatusEquals(userStatus));
+        if (email != null) spec = spec.and(SpecificationTemplate.emailLike(email));
+        if (fullName != null) spec = spec.and(SpecificationTemplate.fullNameLike(fullName));
 
         Page<UserModel> userModelPage = userService.findAll(spec, page);
 
-        if (!userModelPage.isEmpty()) {
-            for(UserModel user : userModelPage.toList()) {
+        if (!userModelPage.isEmpty())
+            for(UserModel user : userModelPage.toList())
                 user.add(linkTo(methodOn(UserController.class).getOneUser(user.getId())).withSelfRel());
-            }
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(userModelPage);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getOneUser(@PathVariable(value = "id") UUID id) {
         log.debug("GET getOneUser id received {}", id);
-        Optional<UserModel> userModelOptional = userService.findById(id);
-        return userModelOptional.<ResponseEntity<Object>>map(userModel -> ResponseEntity.status(HttpStatus.OK).body(userModel)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
+        UserDetailsImpl currentUser = authenticationCurrentUserService.getCurrentUser();
+        var authorities = currentUser.getAuthorities();
+
+        if (currentUser.getUserId().equals(id)  || authorities.contains("ROLE_INSTRUCTOR") || authorities.contains("ROLE_ADMIN")) {
+            Optional<UserModel> userModelOptional = userService.findById(id);
+            return userModelOptional.<ResponseEntity<Object>>map(userModel -> ResponseEntity.status(HttpStatus.OK).body(userModel)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
+        } else {
+            throw new AccessDeniedException("Forbidden");
+        }
     }
 
     @DeleteMapping("/{id}")
