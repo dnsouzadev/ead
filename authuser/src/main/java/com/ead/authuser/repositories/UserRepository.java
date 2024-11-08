@@ -1,6 +1,7 @@
 package com.ead.authuser.repositories;
 
 import com.ead.authuser.models.UserModel;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -15,4 +16,7 @@ public interface UserRepository extends JpaRepository<UserModel, UUID>, JpaSpeci
 
     @EntityGraph(attributePaths = "roles", type = EntityGraph.EntityGraphType.FETCH)
     Optional<UserModel> findByUsername(String username);
+
+    @EntityGraph(attributePaths = "roles", type = EntityGraph.EntityGraphType.FETCH)
+    @NonNull Optional<UserModel> findById(@NonNull UUID userId);
 }
