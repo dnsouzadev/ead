@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class LessonController {
     @Autowired
     private ModuleService moduleService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping("/modules/{moduleId}/lessons")
     public ResponseEntity<?> createLesson(@PathVariable UUID moduleId, @RequestBody LessonDto lessonDto) {
         Optional<ModuleModel> moduleModel = moduleService.findById(moduleId);
@@ -49,10 +51,11 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.CREATED).body(lessonService.save(lessonModel));
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("/modules/{moduleId}/lessons/{lessonId}")
     public ResponseEntity<?> deleteLesson(@PathVariable("moduleId") UUID moduleId, @PathVariable("lessonId") UUID lessonId) {
         Optional<LessonModel> lessonModelOptional = lessonService.findLessonIntoModule(moduleId, lessonId);
-        if(!lessonModelOptional.isPresent()) {
+        if(lessonModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found for this module");
         }
 
@@ -60,10 +63,11 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Lesson deleted");
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("/modules/{moduleId}/lessons/{lessonId}")
     public ResponseEntity<?> updateLesson(@PathVariable("moduleId") UUID moduleId, @PathVariable("lessonId") UUID lessonId, @RequestBody LessonDto lessonDto) {
         Optional<LessonModel> lessonModelOptional = lessonService.findLessonIntoModule(moduleId, lessonId);
-        if(!lessonModelOptional.isPresent()) {
+        if(lessonModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found for this module");
         }
 
@@ -75,12 +79,14 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.OK).body(lessonService.save(lessonModel));
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/modules/{moduleId}/lessons/{lessonId}")
     public ResponseEntity<?> getLesson(@PathVariable("moduleId") UUID moduleId, @PathVariable("lessonId") UUID lessonId) {
         Optional<LessonModel> lessonModelOptional = lessonService.findLessonIntoModule(moduleId, lessonId);
         return lessonModelOptional.<ResponseEntity<?>>map(lessonModel -> ResponseEntity.status(HttpStatus.OK).body(lessonModel)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found"));
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/modules/{moduleId}/lessons")
     public ResponseEntity<Page<LessonModel>> getAllLessons(@PathVariable("moduleId") UUID moduleId,
                                                            @RequestParam(required = false) String title,

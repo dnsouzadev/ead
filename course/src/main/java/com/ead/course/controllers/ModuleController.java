@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,11 +35,12 @@ public class ModuleController {
     @Autowired
     private CourseService courseService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping("/courses/{courseId}/modules")
     public ResponseEntity<Object> saveModule(@PathVariable UUID courseId, @RequestBody @Valid ModuleDto moduleDto) {
 
         Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
-        if(!courseModelOptional.isPresent()) {
+        if(courseModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found");
         }
 
@@ -49,11 +51,12 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(moduleService.save(moduleModel));
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("/courses/{courseId}/modules/{moduleId}")
     public ResponseEntity<Object> deleteModule(@PathVariable(value = "courseId") UUID courseId, @PathVariable(value = "moduleId") UUID moduleId) {
         Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
 
-        if(!moduleModelOptional.isPresent()) {
+        if(moduleModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course");
 
         }
@@ -61,11 +64,12 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Module deleted successfully");
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("/courses/{courseId}/modules/{moduleId}")
     public ResponseEntity<Object> updateModule(@PathVariable(value = "courseId") UUID courseId, @PathVariable(value = "moduleId") UUID moduleId, @RequestBody @Valid ModuleDto moduleDto) {
         Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
 
-        if(!moduleModelOptional.isPresent()) {
+        if(moduleModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course");
         }
 
@@ -75,6 +79,7 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.save(moduleModel));
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/courses/{courseId}/modules")
     public ResponseEntity<Page<ModuleModel>> getAllModules(@PathVariable("courseId") UUID courseId,
                                                            @RequestParam(required = false) String title,
@@ -88,13 +93,11 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.findAllByCourse(SpecificationTemplate.moduleCourseId(courseId).and(spec), page));
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/courses/{courseId}/modules/{moduleId}")
     public ResponseEntity<Object> getOneModule(@PathVariable(value = "courseId") UUID courseId, @PathVariable(value = "moduleId") UUID moduleId) {
         Optional<ModuleModel> moduleModelOptional = moduleService.findModuleIntoCourse(courseId, moduleId);
-        if (!moduleModelOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(moduleModelOptional.get());
+        return moduleModelOptional.<ResponseEntity<Object>>map(moduleModel -> ResponseEntity.status(HttpStatus.OK).body(moduleModel)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found for this course"));
     }
 
 }
