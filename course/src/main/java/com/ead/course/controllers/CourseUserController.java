@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,6 +35,7 @@ public class CourseUserController {
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @GetMapping("/courses/{courseId}/users")
     public ResponseEntity<Object> getAllUsersByCourse(@RequestParam(required = false) String email,
                                                       @RequestParam(required = false) String fullName,
@@ -55,6 +57,7 @@ public class CourseUserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), page));
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @PostMapping("/courses/{courseId}/users/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable("courseId") UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
         log.debug("POST saveSubscriptionUserInCourse");
@@ -69,7 +72,6 @@ public class CourseUserController {
 
         if (userModelOptional.get().getUserStatus().equals(UserStatus.BLOCKED.toString())) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is blocked");
 
-//        courseService.saveSubscriptionUserInCourse(courseExists.get().getId(), userModelOptional.get().getId());
         courseService.saveSubscriptionUserInCourseAndSendNotification(courseExists.get(), userModelOptional.get());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Subscription created successfully");
