@@ -6,8 +6,7 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 public class NotificationCommandDto {
 
     private String title;

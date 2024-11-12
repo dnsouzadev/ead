@@ -1,5 +1,6 @@
 package com.ead.course.validation;
 
+import com.ead.course.configs.security.AuthenticationCurrentUserService;
 import com.ead.course.dtos.CourseDto;
 import com.ead.course.dtos.UserDto;
 import com.ead.course.enums.UserType;
@@ -8,6 +9,7 @@ import com.ead.course.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -25,6 +27,9 @@ public class CourseValidator implements Validator {
     @Autowired
     UserService userService;
 
+    @Autowired
+    private AuthenticationCurrentUserService authenticationCurrentUserService;
+
     @Override
     public boolean supports(Class<?> aClass) {
         return false;
@@ -40,14 +45,19 @@ public class CourseValidator implements Validator {
     }
 
     private void validateUserInstructor(UUID userInstructor, Errors errors) {
-        Optional<UserModel> userModelOptional = userService.findById(userInstructor);
-        if(userModelOptional.isEmpty()) {
-            errors.rejectValue("userInstructor", "userInstructorError", "User not found");
-        } else {
-            UserModel userModel = userModelOptional.get();
-            if(userModel.getUserType().equals(UserType.STUDENT.toString())) {
-                errors.rejectValue("userInstructor", "userInstructorError", "User is not an instructor");
+        UUID currentUserId = authenticationCurrentUserService.getCurrentUser().getUserId();
+        if(currentUserId.equals(userInstructor)) {
+            Optional<UserModel> userModelOptional = userService.findById(userInstructor);
+            if (userModelOptional.isEmpty()) {
+                errors.rejectValue("userInstructor", "userInstructorError", "User not found");
+            } else {
+                UserModel userModel = userModelOptional.get();
+                if (userModel.getUserType().equals(UserType.STUDENT.toString())) {
+                    errors.rejectValue("userInstructor", "userInstructorError", "User is not an instructor");
+                }
             }
+        } else {
+            throw new AccessDeniedException("Access denied");
         }
     }
 }

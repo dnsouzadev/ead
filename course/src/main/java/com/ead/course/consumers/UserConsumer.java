@@ -25,6 +25,7 @@ public class UserConsumer {
     public void listenUserEvent(@Payload UserEventDto userEventDto) {
 
         var userModel = userEventDto.convertToUserModel();
+        System.out.println("UserConsumer.listenUserEvent: " + userModel);
 
         switch (ActionType.valueOf(userEventDto.getActionType())) {
             case CREATE, UPDATE:
